@@ -1,0 +1,215 @@
+openapi: 3.0.3
+
+info:
+  title: MusicTheoryAI API
+  description: >
+    An interactive REST API for learning music theory.
+    Provides endpoints to retrieve notes, chords, and scales.
+  version: "0.1.0"
+
+servers:
+  - url: http://127.0.0.1:5000
+    description: Local development server
+
+paths:
+  /:
+    get:
+      summary: API index
+      description: Returns basic information about the API and available endpoints.
+      responses:
+        "200":
+          description: API metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiIndex"
+
+  /api/health:
+    get:
+      summary: Health check
+      description: Check whether the API is running.
+      responses:
+        "200":
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /api/note/{note}:
+    get:
+      summary: Get note information
+      description: Returns frequency and octave information for a musical note.
+      parameters:
+        - name: note
+          in: path
+          required: true
+          description: Musical note (e.g. C, D#, A)
+          schema:
+            type: string
+            example: C
+      responses:
+        "200":
+          description: Note information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "400":
+          description: Invalid note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/chord/{root}/{type}:
+    get:
+      summary: Get chord information
+      description: Returns information about a chord for a given root and type.
+      parameters:
+        - name: root
+          in: path
+          required: true
+          description: Root note of the chord
+          schema:
+            type: string
+            example: C
+        - name: type
+          in: path
+          required: true
+          description: Chord type (e.g. major, minor)
+          schema:
+            type: string
+            example: minor
+      responses:
+        "200":
+          description: Chord information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chord"
+        "400":
+          description: Invalid chord type or root
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/scale/{root}/{type}:
+    get:
+      summary: Get scale information
+      description: Returns notes and interval pattern for a musical scale.
+      parameters:
+        - name: root
+          in: path
+          required: true
+          description: Root note of the scale
+          schema:
+            type: string
+            example: D
+        - name: type
+          in: path
+          required: true
+          description: Scale type (e.g. major, minor)
+          schema:
+            type: string
+            example: minor
+      responses:
+        "200":
+          description: Scale information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scale"
+        "400":
+          description: Invalid scale type or root
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    ApiIndex:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Welcome to MusicTheoryAI
+        description:
+          type: string
+          example: An interactive platform for learning music theory
+        version:
+          type: string
+          example: "0.1.0"
+        endpoints:
+          type: object
+          additionalProperties:
+            type: string
+
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-01-14T22:05:19.800175"
+
+    Note:
+      type: object
+      properties:
+        name:
+          type: string
+          example: C
+        frequency:
+          type: number
+          format: float
+          example: 261.63
+        octave:
+          type: integer
+          example: 4
+
+    Chord:
+      type: object
+      properties:
+        root:
+          type: string
+          example: C
+        type:
+          type: string
+          example: minor
+        notes:
+          type: array
+          items:
+            type: string
+          example: ["C", "D#", "G"]
+
+    Scale:
+      type: object
+      properties:
+        root:
+          type: string
+          example: D
+        type:
+          type: string
+          example: minor
+        notes:
+          type: array
+          items:
+            type: string
+          example: ["D", "E", "F", "G", "A", "A#", "C"]
+        pattern:
+          type: array
+          items:
+            type: integer
+          example: [0, 2, 3, 5, 7, 8, 10]
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Invalid chord type: major
